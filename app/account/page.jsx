@@ -1,5 +1,4 @@
-export const dynamic = 'force-dynamic'; // empêche le prerender
-
+export const dynamic = 'force-dynamic';
 import AccountClient from "./AccountClient";
 
 export default function Page() {
