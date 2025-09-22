@@ -1,6 +1,3 @@
 export const dynamic = 'force-dynamic';
 import SignupClient from "./SignupClient";
-
-export default function Page() {
-  return <SignupClient />;
-}
+export default function Page(){ return <SignupClient/>; }

@@ -4,6 +4,10 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
+function mustComplete(p){
+  return !p?.completed_at || !p?.first_name || !p?.last_name || !p?.birth_date || !p?.gender || !p?.city;
+}
+
 export default function ConfirmClient() {
   const router = useRouter();
   const sp = useSearchParams();
@@ -16,13 +20,18 @@ export default function ConfirmClient() {
       const code = sp.get("code");
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
-        router.replace(error ? "/login?err=exchange" : "/account");
-        return;
+        if (error) { router.replace("/login?err=exchange"); return; }
       }
-      const { data } = await supabase.auth.getSession();
-      router.replace(data.session ? "/account" : "/login?verified=1");
+
+      const { data: u } = await supabase.auth.getUser();
+      if (!u?.user) { router.replace("/login"); return; }
+
+      const { data: p } = await supabase.from("profiles")
+        .select("*").eq("user_id", u.user.id).maybeSingle();
+
+      router.replace(mustComplete(p) ? "/onboarding" : "/");
     })();
-  }, [sp, router]);
+  }, [router, sp]);
 
   return <main className="p-6">Confirmation en cours…</main>;
 }
