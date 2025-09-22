@@ -5,19 +5,40 @@ import { getSupabaseClient } from "@/lib/supabaseClient";
 
 export default function Home() {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
     if (!supabase) return;
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
+
+    // Récupère la session utilisateur
+    supabase.auth.getUser().then(async ({ data }) => {
+      const u = data.user ?? null;
+      setUser(u);
+
+      if (u) {
+        // Va chercher le profil lié dans la table profiles
+        const { data: p } = await supabase
+          .from("profiles")
+          .select("first_name, last_name")
+          .eq("user_id", u.id)
+          .maybeSingle();
+        setProfile(p);
+      }
+    });
   }, []);
 
   async function signOut() {
     const supabase = getSupabaseClient();
     if (!supabase) return;
     await supabase.auth.signOut();
-    location.href = "/"; // on recharge vers accueil
+    location.href = "/";
   }
+
+  const displayName =
+    profile?.first_name
+      ? `${profile.first_name} ${profile.last_name ?? ""}`.trim()
+      : user?.email ?? "";
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
@@ -28,8 +49,10 @@ export default function Home() {
         className="w-24 h-24 mb-6"
       />
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">GroupSave</h1>
-      <p className="text-gray-600 mb-8">Achetez mieux, ensemble</p>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        {user ? `Bonjour, ${displayName} 👋` : "GroupSave"}
+      </h1>
+      {!user && <p className="text-gray-600 mb-8">Achetez mieux, ensemble</p>}
 
       {!user ? (
         // Pas connecté
