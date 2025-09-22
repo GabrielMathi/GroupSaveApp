@@ -71,7 +71,6 @@ export default function AccountClient() {
     <main className="min-h-screen bg-gray-50">
       <TopBar />
       <section className="max-w-lg mx-auto p-6 space-y-8">
-        <div className="text-sm"><a href="/" className="underline">← Retour à l’accueil</a></div>
 
         <header className="space-y-1">
           <h1 className="text-2xl font-bold">Mon compte</h1>

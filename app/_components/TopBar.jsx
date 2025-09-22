@@ -26,7 +26,6 @@ export default function TopBar() {
       <nav className="flex items-center gap-3 text-sm">
         {user ? (
           <>
-            <Link href="/account" className="underline">Mon compte</Link>
             <button onClick={signOut} className="border px-3 py-1 rounded">Se déconnecter</button>
           </>
         ) : (
