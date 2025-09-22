@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
-export default function ConfirmClient() {
+export default function CallbackClient() {
   const router = useRouter();
   const sp = useSearchParams();
 
@@ -17,12 +17,11 @@ export default function ConfirmClient() {
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         router.replace(error ? "/login?err=exchange" : "/account");
-        return;
+      } else {
+        router.replace("/login");
       }
-      const { data } = await supabase.auth.getSession();
-      router.replace(data.session ? "/account" : "/login?verified=1");
     })();
   }, [sp, router]);
 
-  return <main className="p-6">Confirmation en cours…</main>;
+  return <main className="p-6">Connexion en cours…</main>;
 }
